@@ -9,15 +9,27 @@ import (
 
 
 func main() {
-	fmt.Println(os.Getpid())
-	fmt.Println("hit ehre")
-	buffer := make([]byte, 4096)
-	_, err := os.Open("file.txt")
-	_, err = os.Open("file.txt")
-	_, err = syscall.Read(34, buffer)
+	f , err := os.Open("file.txt")
+
 	if err != nil {
-		fmt.Println(err)
+		panic("oh my gosh")
 	}
+
+	dupFd, _ := syscall.Dup(int(f.Fd()))
+
+	fmt.Println("original FD:", int(f.Fd()))
+	fmt.Println("duplicate FD:", dupFd)
+	
+	// read from original fd
+	buffer := make([]byte, 4096)
+	n1, _ := syscall.Read(int(f.Fd()), buffer)
+
+	fmt.Printf("Original read: %q (%d bytes)\n", buffer[:n1], n1)
+
+	buffer2 := make([]byte, 4096)
+	n2, _ := syscall.Read(int(f.Fd()), buffer)
+
+	fmt.Printf("Original read: %q (%d bytes)\n", buffer2[:n2], n2)
 	time.Sleep(10*time.Minute)
 	
 
