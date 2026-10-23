@@ -9,6 +9,7 @@ import (
 
 
 func main() {
+	fmt.Println(os.Getpid())
 	fmt.Println("hit ehre")
 	buffer := make([]byte, 4096)
 	_, err := os.Open("file.txt")
