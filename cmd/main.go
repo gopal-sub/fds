@@ -9,27 +9,30 @@ import (
 
 
 func main() {
-	f , err := os.Open("file.txt")
-
+	fmt.Println(os.Getpid())
+	var p [2]int
+	err := syscall.Pipe(p[:])
 	if err != nil {
-		panic("oh my gosh")
+		fmt.Println(err)
 	}
+	attr := &syscall.ProcAttr{
+		Dir:   "",         // Current working directory (empty means inherit)
+		Env:   os.Environ(), // Inherit environment variables
+		Files: []uintptr{
+			uintptr(syscall.Stdin),  // fd 0: Standard Input
+			uintptr(syscall.Stdout), // fd 1: Standard Output
+			uintptr(syscall.Stderr), // fd 2: Standard Error
+		},
+		Sys: nil, // Additional OS-specific process options if needed
+	}
+	pid, err := syscall.ForkExec("./main", []string{}, attr)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(pid)
 
-	dupFd, _ := syscall.Dup(int(f.Fd()))
 
-	fmt.Println("original FD:", int(f.Fd()))
-	fmt.Println("duplicate FD:", dupFd)
-	
-	// read from original fd
-	buffer := make([]byte, 3)
-	n1, _ := syscall.Read(int(f.Fd()), buffer)
 
-	fmt.Printf("Original read: %q (%d bytes)\n", buffer[:n1], n1)
-
-	buffer2 := make([]byte, 3)
-	n2, _ := syscall.Read(int(f.Fd()), buffer)
-
-	fmt.Printf("dup read: %q (%d bytes)\n", buffer2[:n2], n2)
 	time.Sleep(10*time.Minute)
 	
 
