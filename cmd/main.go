@@ -13,6 +13,7 @@ func main() {
 	fmt.Println("hit ehre")
 	buffer := make([]byte, 4096)
 	_, err := os.Open("file.txt")
+	_, err = os.Open("file.txt")
 	_, err = syscall.Read(34, buffer)
 	if err != nil {
 		fmt.Println(err)
